@@ -29,3 +29,4 @@ git push origin v1.0.0
 ```
 
 You can then download the latest binary from Releases, or share a GitHub Pages link that points to the latest release asset.
+updated 2026
