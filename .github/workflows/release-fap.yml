@@ -1,8 +1,10 @@
-name: Build and Release FAP
+name: Auto Tag and Release FAP
 
 on:
   workflow_dispatch:
   push:
+    branches:
+      - dev
     tags:
       - "v*"
 
@@ -12,10 +14,55 @@ permissions:
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
+    # On a normal branch push, allow skipping a release with [skip release] in
+    # the commit message. Manual dispatch and explicit tag pushes always run.
+    if: ${{ !(github.event_name == 'push' && github.ref_type == 'branch' && contains(github.event.head_commit.message, '[skip release]')) }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine release tag
+        id: tag
+        run: |
+          set -euo pipefail
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            # Triggered by an explicit tag push: use that tag as-is.
+            TAG="${GITHUB_REF_NAME}"
+            echo "Using pushed tag: $TAG"
+          else
+            # Branch push or manual dispatch: compute the next version tag.
+            git fetch --tags --force
+            LATEST="$(git tag -l 'v*' --sort=-v:refname | head -n1)"
+            if [[ -z "$LATEST" ]]; then
+              MAJOR=0; MINOR=1; PATCH=0
+            else
+              VER="${LATEST#v}"
+              MAJOR="${VER%%.*}"
+              REST="${VER#*.}"
+              MINOR="${REST%%.*}"
+              PATCH="${REST##*.}"
+              # Bump: #major / #minor in the latest commit message override the
+              # default patch bump.
+              MSG="$(git log -1 --pretty=%B)"
+              if echo "$MSG" | grep -qiE '#major'; then
+                MAJOR=$((MAJOR + 1)); MINOR=0; PATCH=0
+              elif echo "$MSG" | grep -qiE '#minor'; then
+                MINOR=$((MINOR + 1)); PATCH=0
+              else
+                PATCH=$((PATCH + 1))
+              fi
+            fi
+            TAG="v${MAJOR}.${MINOR}.${PATCH}"
+            echo "Computed next tag: $TAG"
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git tag -a "$TAG" -m "Release $TAG"
+            git push origin "$TAG"
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -34,7 +81,7 @@ jobs:
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: gauge_tool-fap-${{ github.ref_name }}
+          name: gauge_tool-fap-${{ steps.tag.outputs.tag }}
           path: |
             dist/gauge_tool.fap
             dist/gauge_tool.fap.sha256
@@ -42,6 +89,8 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: ${{ steps.tag.outputs.tag }}
           files: |
             dist/gauge_tool.fap
             dist/gauge_tool.fap.sha256
