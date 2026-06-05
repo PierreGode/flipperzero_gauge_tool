@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gauge Tool FAP Download</title>
+  <style>
+    :root {
+      --bg: #f4f7f8;
+      --panel: #ffffff;
+      --text: #1f2933;
+      --muted: #52606d;
+      --accent: #0b7285;
+      --accent-hover: #0f869b;
+      --border: #d9e2ec;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 20% 20%, #dff6fb 0%, transparent 45%),
+        radial-gradient(circle at 85% 15%, #e8f8e5 0%, transparent 35%),
+        linear-gradient(180deg, #f9fcfd 0%, var(--bg) 100%);
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .card {
+      width: min(740px, 100%);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 14px 40px rgba(15, 23, 42, 0.1);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.5rem, 3vw, 2.1rem);
+      letter-spacing: 0.2px;
+    }
+
+    p {
+      margin: 0 0 12px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 18px 0 8px;
+    }
+
+    .btn {
+      display: inline-block;
+      text-decoration: none;
+      font-weight: 600;
+      padding: 11px 16px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      transition: transform .12s ease, background-color .12s ease;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: #fff;
+      color: var(--text);
+      border-color: var(--border);
+    }
+
+    .btn-secondary:hover {
+      transform: translateY(-1px);
+    }
+
+    code {
+      font-family: Consolas, "Courier New", monospace;
+      background: #f0f4f8;
+      border: 1px solid #e4ebf2;
+      padding: 1px 6px;
+      border-radius: 6px;
+      color: #334e68;
+    }
+
+    ul {
+      color: var(--muted);
+      padding-left: 20px;
+      margin: 8px 0 0;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>Gauge Tool .fap</h1>
+    <p>
+      This page points to the latest built release of the Gauge Tool app for Flipper Zero.
+    </p>
+
+    <div class="actions">
+      <a class="btn btn-primary" href="https://github.com/skotopes/flipperzero_gauge_tool/releases/latest/download/gauge_tool.fap">Download latest .fap</a>
+      <a class="btn btn-secondary" href="https://github.com/skotopes/flipperzero_gauge_tool/releases">All releases</a>
+    </div>
+
+    <p>CLI install (qFlipper alternative):</p>
+    <p><code>ufbt launch</code></p>
+
+    <ul>
+      <li>The .fap file is produced automatically when a tag like v1.0.0 is pushed.</li>
+      <li>Each release also includes a SHA256 checksum file.</li>
+    </ul>
+  </main>
+</body>
+</html>
